@@ -1,13 +1,17 @@
 from PyQt5 import QtGui
 import sys
 from PyQt5.uic import loadUi
+from PyQt5 import QtGui, QtWidgets
+import sys
+from PyQt5.uic import loadUi
 from PyQt5.QtWidgets import QMainWindow, QApplication, QWidget, QPushButton, QAction, QActionGroup, QFileDialog, \
     QTableWidget, QTableWidgetItem, QVBoxLayout, QComboBox
 from PyQt5.QtGui import QIcon
-from PyQt5.QtCore import pyqtSlot, QRect
+from PyQt5.QtCore import pyqtSlot, QRect, Qt
 import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
+from PyQt5.uic.properties import QtCore
 from scipy.interpolate import spline
 class MainFrame(QMainWindow):
     def __init__(self):
@@ -21,7 +25,7 @@ class MainFrame(QMainWindow):
         loadUi('Screen.ui', self)
         self.actionLoad.triggered.connect(self.load_csv_file)
         self.actionPlot_Data.triggered.connect(self.plot)
-        self.show()
+        #self.show()
     def setScreen(self):
         self.setWindowTitle(self.title)
         self.setGeometry(self.left, self.top, self.width, self.height)
@@ -61,8 +65,8 @@ class MainFrame(QMainWindow):
         button3 = QPushButton('lines', self)
         button3.move(800, 70)
         button3.clicked.connect(self.on_click_lines)
-        centralWidget = QWidget(self)
 
+        centralWidget = QWidget(self)
         self.setCentralWidget(centralWidget)
         self.comboBox1= QComboBox(centralWidget)
         self.comboBox1.setGeometry(QRect(3, 3, 600, 31))
@@ -82,7 +86,7 @@ class MainFrame(QMainWindow):
 
     def load_csv_file(self):
         options = QFileDialog.Options()
-        options= QFileDialog.DontUseNativeDialog
+        options |= QFileDialog.DontUseNativeDialog
         self.fileName= QFileDialog.getOpenFileName(self, "QFileDialog.getOpenFileName()", "",
                                        "Python Files (*.csv)", options=options)
 
@@ -94,13 +98,28 @@ class MainFrame(QMainWindow):
         self.layout = QVBoxLayout()
         self.layout.addWidget(self.tableWidget)
         self.setLayout(self.layout)
+        self.show()
     def createTable(self):
         df=data.shape
-        self.tableWidget = QTableWidget()
+      #  self.setCentralWidget(centralWidget)
+        #self.setFlags(QtCore.Qt.ItemIsSelectable | QtCore.Qt.ItemIsEnabled)
+        centralWidget = QWidget(self)
+        self.setCentralWidget(centralWidget)
+        self.tableWidget = QTableWidget(centralWidget)
+
         self.tableWidget.setRowCount(df[0])
         self.tableWidget.setColumnCount(df[1])
 
+        list=data.values
+        for i in range(0,df[0]):
+            for j in range(0,df[1]):
+                self.tableWidget.setItem(i,j, QTableWidgetItem(str(list[i][j])))
+
+        #self.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
+
+       # self.table.setEditTriggers(QWidget.QAbstractItemView.NoEditTriggers)
 if __name__ == '__main__':
     application = QApplication(sys.argv)
     start= MainFrame()
+    start.show()
     sys.exit(application.exec())
